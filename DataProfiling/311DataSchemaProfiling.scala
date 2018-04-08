@@ -3,6 +3,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.sql.SQLContext 
+import org.apache.spark.sql.types.IntegerType
 
 val sqlContext = new SQLContext(sc)
 
