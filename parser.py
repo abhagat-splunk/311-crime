@@ -20,6 +20,8 @@ for y in finalZipCodes:
 	print y
 g = open("resultZipCodeData.txt","w")
 for x in zipCodeList:
-	g.write(str(x).strip()+",")
+	convX = int(str(x).strip())
+	if (convX>=10000 and convX<=10499) or (convX>=11000 and convX<=11099) or (convX>=11200 and convX<=11299):
+		g.write(str(convX)+",")
 f.close()
 g.close()	
