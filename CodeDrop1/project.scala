@@ -28,7 +28,7 @@ val df311 = sqlContext.read.format("com.databricks.spark.csv").option("header","
 val df311_2 = df311.withColumn("Zipcode", df311("Incident Zip").cast(IntegerType))
 
 // Filtering out only the zipcodes valid in NYC for the 311 dataset
-val df311_3 = df311_2.filter($"IncidentZip".isin(li:_*))
+val df311_3 = df311_2.filter($"Zipcode".isin(li:_*))
 
 // showing zipcode statistics
 df311_3.describe().show()
