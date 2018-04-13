@@ -32,3 +32,6 @@ val df311_3 = df311_2.filter($"Zipcode".isin(li:_*))
 
 // showing zipcode statistics
 df311_3.describe().show()
+
+// Joining the ACS and the 311 dataset based on the Zipcode column
+val combined_1 = df311_3.join(acs_df4, df311_3("Zipcode") === acs_df4("Zipcode"), "inner")
