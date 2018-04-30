@@ -58,7 +58,7 @@ public class PointInPolygon {
 
     double lat = Double.parseDouble(latitude);
     double lon = Double.parseDouble(longitude);
-    Point p = fac.createPoint(new Coordinate(lat, lon));
+    Point p = fac.createPoint(new Coordinate(lon, lat));
     return tester.isInShape(p);
   }
 
