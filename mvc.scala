@@ -89,3 +89,5 @@ mvc_df5.registerTempTable("mvc_df_combined")
 val new_combined_4 = sqlContext.sql("select sum(`NUMBER OF PERSONS INJURED`) as `Number of Persons Injured`, sum(`NUMBER OF PEDESTRIANS INJURED`) as `Number of Pedestrians Injured`, sum(`NUMBER OF CYCLIST INJURED`) as `Number of Cyclist Injured`, sum(`NUMBER OF MOTORIST INJURED`) as `Number of Motorists Injured`,Zipcode from mvc_df_combined group by Zipcode")
 
 val new_combined_5 = new_combined_3.join(new_combined_4, Seq("Zipcode"), "inner")
+
+val new_combined_6  = new_combined_5.withColumn("Population", new_combined_5("Population").cast(DoubleType))
