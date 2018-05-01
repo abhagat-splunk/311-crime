@@ -40,6 +40,11 @@ val combined_1 = df311_3.join(acs_df4, Seq("Zipcode"), "inner")
 
 combined_1.registerTempTable("combinedData")
 
+val combined_3 = sqlContext.sql("SELECT COUNT(`Unique Key`) as `Number of Parking Violations`,Zipcode, `HC01_VC03` as `Population` FROM combinedData where `Complaint Type`='Noise - Street/Sidewalk' OR `Complaint Type`='Street Condition' OR `Complaint Type`='Street Light Condition' OR `Complaint Type`='Street Sign - Damaged' OR `Complaint Type`='Street Sign - Dangling' OR `Complaint Type` = 'Street Sign - Missing' group by Zipcode, `HC01_VC03`")
+
+val new_combined_3 = sqlContext.sql("select count(case when `Complaint Type`='Noise - Street/Sidewalk' then 1 else null end) as NoiseStreetSideWalk, count(case when `Complaint Type`='Street Condition' then 1 else null end) as StreetCondition, count(case when `Complaint Type`='Street Light Condition' then 1 else null end) as StreetLightCondition, count(case when `Complaint Type`='Street Sign - Damaged' then 1 else null end) as StreetSignDamaged, count(case when `Complaint Type`='Street Sign - Dangling' then 1 else null end) as StreetSignDangling, count(case when `Complaint Type`='Street Sign - Missing' then 1 else null end) as StreetSignMissing,Zipcode, `HC01_VC03` as `Population` from combinedData group by Zipcode, `HC01_VC03`")
+
+
 
 // MVC DF1
 val mvc_df1 = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").option("inferSchema", "false").load("bdad/MotorColl.csv")
@@ -64,8 +69,23 @@ val coordinateToZip = udf(toZipcode _)
 
 val mvc_df4 = mvc_df3.withColumn("zipcode_new", coordinateToZip.apply(col("LATITUDE"), col("LONGITUDE")))
 
-mvc_df4.registerTempTable("mvc")
 
-val combined_3 = sqlContext.sql("SELECT COUNT(`Unique Key`) as `Number of Parking Violations`,Zipcode, `HC01_VC03` as `Population` FROM combinedData where `Complaint Type`='Noise - Street/Sidewalk' OR `Complaint Type`='Street Condition' OR `Complaint Type`='Street Light Condition' OR `Complaint Type`='Street Sign - Damaged' OR `Complaint Type`='Street Sign - Dangling' OR `Complaint Type` = 'Street Sign - Missing' group by Zipcode, `HC01_VC03`")
+var mvc_df5 = mvc_df4.drop("CONTRIBUTING FACTOR VEHICLE 1")
+mvc_df5 = mvc_df5.drop("CONTRIBUTING FACTOR VEHICLE 2")
+mvc_df5 = mvc_df5.drop("CONTRIBUTING FACTOR VEHICLE 3")
+mvc_df5 = mvc_df5.drop("CONTRIBUTING FACTOR VEHICLE 4")
+mvc_df5 = mvc_df5.drop("CONTRIBUTING FACTOR VEHICLE 5")
 
-val new_combined_3 = sqlContext.sql("select count(case when `Complaint Type`='Noise - Street/Sidewalk' then 1 else null end) as NoiseStreetSideWalk, count(case when `Complaint Type`='Street Condition' then 1 else null end) as StreetCondition, count(case when `Complaint Type`='Street Light Condition' then 1 else null end) as StreetLightCondition, count(case when `Complaint Type`='Street Sign - Damaged' then 1 else null end) as StreetSignDamaged, count(case when `Complaint Type`='Street Sign - Dangling' then 1 else null end) as StreetSignDangling, count(case when `Complaint Type`='Street Sign - Missing' then 1 else null end) as StreetSignMissing,Zipcode, `HC01_VC03` as `Population` from combinedData group by Zipcode, `HC01_VC03`")
+mvc_df5 = mvc_df5.drop("VEHICLE TYPE CODE 1")
+mvc_df5 = mvc_df5.drop("VEHICLE TYPE CODE 2")
+mvc_df5 = mvc_df5.drop("VEHICLE TYPE CODE 3")
+mvc_df5 = mvc_df5.drop("VEHICLE TYPE CODE 4")
+mvc_df5 = mvc_df5.drop("VEHICLE TYPE CODE 5")
+
+mvc_df5 = mvc_df5.drop("OFF STREET NAME")
+
+mvc_df5.registerTempTable("mvc_df_combined")
+
+val new_combined_4 = sqlContext.sql("select sum(`NUMBER OF PERSONS INJURED`) as `Number of Persons Injured`, sum(`NUMBER OF PEDESTRIANS INJURED`) as `Number of Pedestrians Injured`, sum(`NUMBER OF CYCLIST INJURED`) as `Number of Cyclist Injured`, sum(`NUMBER OF MOTORIST INJURED`) as `Number of Motorists Injured`,Zipcode from mvc_df_combined group by Zipcode")
+
+
