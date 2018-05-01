@@ -3,6 +3,7 @@
 // compile jar using mvn clean compile assembly:single
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.functions.udf
 
 // Loading the ACS dataset with population statistics in a dataframe
