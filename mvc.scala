@@ -110,3 +110,24 @@ val new_combined_7 = Seq(
     col(colName)/col("Population")
   )
 }
+
+val streetList = Seq(
+  "NoiseStreetSideWalk",
+  "StreetCondition",
+  "StreetLightCondition",
+  "StreetSignDamaged",
+  "StreetSignDangling",
+  "StreetSignMissing")
+
+val motorList = Seq(
+  "Number of Persons Injured",
+  "Number of Pedestrians Injured",
+  "Number of Cyclist Injured",
+  "Number of Motorists Injured"
+)
+
+val cross = streetList.flatMap(x => motorList.map(y => (x, y)))
+
+val correlations = cross.map{case (x, y) => (x + " - " + y, new_combined_7.stat.corr(x, y))}
+
+correlations.foreach(println)
