@@ -46,7 +46,7 @@ var mvc_df2 = mvc_df1.na.drop(List("LATITUDE","LONGITUDE","LOCATION"))
 mvc_df2 = mvc_df1.withColumn("Zipcode", mvc_df1("ZIP CODE").cast(IntegerType))
 mvc_df2.printSchema()
 val mvc_df3 = mvc_df2.filter($"Zipcode".isin(li:_* ))
-mvc_df3.describe().show()
+//mvc_df3.describe().show()
 
 
 def toZipcode(lat: String, long: String): Option[String] = {
@@ -61,4 +61,4 @@ def toZipcode(lat: String, long: String): Option[String] = {
 
 val coordinateToZip = udf(toZipcode _)
 
-val mvc_df4 = mvc_df2.withColumn("zipcode_new", coordinateToZip.apply(col("LATITUDE"), col("LONGITUDE")))
+val mvc_df4 = mvc_df3.withColumn("zipcode_new", coordinateToZip.apply(col("LATITUDE"), col("LONGITUDE")))
