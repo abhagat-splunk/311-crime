@@ -63,3 +63,7 @@ def toZipcode(lat: String, long: String): Option[String] = {
 val coordinateToZip = udf(toZipcode _)
 
 val mvc_df4 = mvc_df3.withColumn("zipcode_new", coordinateToZip.apply(col("LATITUDE"), col("LONGITUDE")))
+
+mvc_df4.registerTempTable("mvc")
+
+val combined_3 = sqlContext.sql("SELECT COUNT(`Unique Key`) as `Number of Parking Violations`,Zipcode, `HC01_VC03` as `Population` FROM combinedData where `Complaint Type`='Noise - Street/Sidewalk' OR `Complaint Type`='Street Condition' OR `Complaint Type`='Street Light Condition' OR `Complaint Type`='Street Sign - Damaged' OR `Complaint Type`='Street Sign - Dangling' OR `Complaint Type` = 'Street Sign - Missing' group by Zipcode, `HC01_VC03`")
