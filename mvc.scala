@@ -1,5 +1,6 @@
 //spark-shell --packages com.databricks:spark-csv_2.10:1.5.0 --jars /home/cloudera/Shapefile-1.0-SNAPSHOT-jar-with-dependencies.jar
 // Run the above command before executing the commands below
+// compile jar using mvn clean compile assembly:single
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.functions.udf
