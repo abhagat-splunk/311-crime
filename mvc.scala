@@ -1,4 +1,4 @@
-//spark-shell --packages com.databricks:spark-csv_2.10:1.5.0 --jars /scratch/acb693/311-crime/Shapefile2/jar/Shapefile-1.0-SNAPSHOT-jar-with-dependencies.jar
+//spark-shell --packages com.databricks:spark-csv_2.10:1.5.0 --jars /scratch/acb693/Shapefile-1.0-SNAPSHOT-jar-with-dependencies.jar
 // Run the above command before executing the commands below
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.types.StringType
