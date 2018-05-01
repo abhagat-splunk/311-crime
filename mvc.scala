@@ -92,3 +92,21 @@ val new_combined_4 = sqlContext.sql("select sum(`NUMBER OF PERSONS INJURED`) as 
 val new_combined_5 = new_combined_3.join(new_combined_4, Seq("Zipcode"), "inner")
 
 val new_combined_6  = new_combined_5.withColumn("Population", new_combined_5("Population").cast(DoubleType))
+
+val new_combined_7 = Seq(
+  "NoiseStreetSideWalk",
+  "StreetCondition",
+  "StreetLightCondition",
+  "StreetSignDamaged",
+  "StreetSignDangling",
+  "StreetSignMissing",
+  "Number of Persons Injured",
+  "Number of Pedestrians Injured",
+  "Number of Cyclist Injured",
+  "Number of Motorists Injured"
+).foldLeft(new_combined_6) { (memoDF, colName) =>
+  memoDF.withColumn(
+    colName,
+    col(colName)/col("Population")
+  )
+}
