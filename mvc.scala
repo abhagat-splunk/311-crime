@@ -6,7 +6,7 @@ import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.functions.udf
 
 // Loading the ACS dataset with population statistics in a dataframe
-val acs_df = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").option("inferSchema", "true").load("bdad/ACS_16_5YR_DP05.csv")
+val acs_df = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").option("inferSchema", "false").load("bdad/ACS_16_5YR_DP05.csv")
 
 // casting the population column from string to Int
 val acs_df2 = acs_df.withColumn("Population", acs_df("HC01_VC03").cast(IntegerType))
