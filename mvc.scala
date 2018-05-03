@@ -155,7 +155,7 @@ def setNotNullable( df: DataFrame) : DataFrame = {
 }
 val comb_8 = setNotNullable(comb_7)
 
-val pvalues = cross.foreach{
+val pvalues = cross.map{
   case (x, y) => 
   val featureCols = Array(x)
   val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
@@ -189,7 +189,7 @@ val new_combined_8 = sqlContext.sql("select count(case when `CONTRIBUTING FACTOR
 
 val new_combined_9 = new_combined_3.join(new_combined_8, Seq("Zipcode"), "inner")
 
-new_combined_9.registertempTable("mvc_df_combined_3")
+new_combined_9.registerTempTable("mvc_df_combined_3")
 
 val new_combined_10  = new_combined_5.withColumn("Population", new_combined_5("Population").cast(DoubleType))
 
@@ -226,7 +226,7 @@ val correlations_2 = cross_2.map{case (x, y) => (x + " - " + y, new_combined_11.
 
 correlations_2.foreach(println)
 
-val pvalues_2 = cross_2.foreach{
+val pvalues_2 = cross_2.map{
   case (x, y) => 
   val featureCols = Array(x)
   val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
