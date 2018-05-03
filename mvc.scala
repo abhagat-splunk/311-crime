@@ -131,3 +131,60 @@ val cross = streetList.flatMap(x => motorList.map(y => (x, y)))
 val correlations = cross.map{case (x, y) => (x + " - " + y, new_combined_7.stat.corr(x, y))}
 
 correlations.foreach(println)
+
+
+var mvc_df6 = mvc_df4.drop("CONTRIBUTING FACTOR VEHICLE 2")
+mvc_df6 = mvc_df6.drop("CONTRIBUTING FACTOR VEHICLE 3")
+mvc_df6 = mvc_df6.drop("CONTRIBUTING FACTOR VEHICLE 4")
+mvc_df6 = mvc_df6.drop("CONTRIBUTING FACTOR VEHICLE 5")
+
+mvc_df6 = mvc_df6.drop("VEHICLE TYPE CODE 1")
+mvc_df6 = mvc_df6.drop("VEHICLE TYPE CODE 2")
+mvc_df6 = mvc_df6.drop("VEHICLE TYPE CODE 3")
+mvc_df6 = mvc_df6.drop("VEHICLE TYPE CODE 4")
+mvc_df6 = mvc_df6.drop("VEHICLE TYPE CODE 5")
+
+mvc_df6.registerTempTable("mvc_df_combined_2")
+
+val new_combined_8 = sqlContext.sql("select count(case when `CONTRIBUTING FACTOR VEHICLE 1`='Driver Inattention/Distraction' then 1 else null end) as DriverInattention, count(case when `CONTRIBUTING FACTOR VEHICLE 1`='Failure to Yield Right-of-Way' then 1 else null end) as FailureToYieldRightOfWay, count(case when `CONTRIBUTING FACTOR VEHICLE 1`='Fatigued/Drowsy' then 1 else null end) as Drowsy, count(case when `CONTRIBUTING FACTOR VEHICLE 1`='Backing Unsafely' then 1 else null end) as BackingUnsafely, count(case when `CONTRIBUTING FACTOR VEHICLE 1`='Following Too Closely' then 1 else null end) as FollowingTooClosely from mvc_df_combined_2 group by Zipcode")
+
+val new_combined_9 = new_combined_3.join(new_combined_8, Seq("Zipcode"), "inner")
+
+new_combined_9.registertempTable("mvc_df_combined_3")
+
+val new_combined_10  = new_combined_5.withColumn("Population", new_combined_5("Population").cast(DoubleType))
+
+
+val new_combined_11 = Seq(
+  "NoiseStreetSideWalk",
+  "StreetCondition",
+  "StreetLightCondition",
+  "StreetSignDamaged",
+  "StreetSignDangling",
+  "StreetSignMissing",
+  "DriverInattention",
+  "FailureToYieldRightOfWay",
+  "Drowsy",
+  "BackingUnsafely",
+  "FollowingTooClosely"
+).foldLeft(new_combined_10) { (memoDF, colName) =>
+  memoDF.withColumn(
+    colName,
+    col(colName)/col("Population")
+  )
+}
+
+
+val contributingFactorList = Seq(
+  "DriverInattention",
+  "FailureToYieldRightOfWay",
+  "Drowsy",
+  "BackingUnsafely",
+  "FollowingTooClosely"
+)
+
+val cross_2 = streetList.flatMap(x => contributingFactorList.map(y => (x, y)))
+
+val correlations_2 = cross_2.map{case (x, y) => (x + " - " + y, new_combined_11.stat.corr(x, y))}
+
+correlations_2.foreach(println)
