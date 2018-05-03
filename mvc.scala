@@ -155,7 +155,7 @@ def setNotNullable( df: DataFrame) : DataFrame = {
 }
 val comb_8 = setNotNullable(comb_7)
 
-val pvalues = val cross.foreach{
+val pvalues = cross.foreach{
   case (x, y) => 
   val featureCols = Array(x)
   val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
