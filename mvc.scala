@@ -5,6 +5,12 @@ import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.functions.udf
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.StringIndexer
+import org.apache.spark.ml.regression.LinearRegression
+import org.apache.spark.sql.types.{StructField, StructType}
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 // Loading the ACS dataset with population statistics in a dataframe
 val acs_df = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").option("inferSchema", "false").load("bdad/ACS_16_5YR_DP05.csv")
@@ -130,8 +136,41 @@ val cross = streetList.flatMap(x => motorList.map(y => (x, y)))
 
 val correlations = cross.map{case (x, y) => (x + " - " + y, new_combined_7.stat.corr(x, y))}
 
+println("correlation values for the correlation results using person correlation")
+println("------------------------------------------------------------------")
 correlations.foreach(println)
 
+new_combined_7.cache()
+val comb_7 = new_combined_7.na.drop
+
+def setNotNullable( df: DataFrame) : DataFrame = {
+  // get schema
+  val schema = df.schema
+  // modify [[StructField] with name `cn`
+  val newSchema = StructType(schema.map {
+    case StructField( c, t, _, m) => StructField( c, t, nullable = false, m)
+  })
+  // apply new schema
+  df.sqlContext.createDataFrame( df.rdd, newSchema )
+}
+val comb_8 = setNotNullable(comb_7)
+
+val pvalues = val cross.foreach{
+  case (x, y) => 
+  val featureCols = Array(x)
+  val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
+  val mlDf = assembler.transform(comb_8)
+
+  val labelIndexer = new StringIndexer().setInputCol(y).setOutputCol("label")
+  val mldf_2 = labelIndexer.fit(mlDf).transform(mlDf)
+
+  val lr = new LinearRegression().setMaxIter(1000).setRegParam(0.3).setElasticNetParam(0.0)
+  val model = lr.fit(mldf_2)
+  (x + " - " + y, model.summary.pValues(0))
+}
+println("pvalues for the correlation results using Linear regression model")
+println("------------------------------------------------------------------")
+pvalues.foreach(println)
 
 var mvc_df6 = mvc_df4.drop("CONTRIBUTING FACTOR VEHICLE 2")
 mvc_df6 = mvc_df6.drop("CONTRIBUTING FACTOR VEHICLE 3")
@@ -154,7 +193,6 @@ new_combined_9.registertempTable("mvc_df_combined_3")
 
 val new_combined_10  = new_combined_5.withColumn("Population", new_combined_5("Population").cast(DoubleType))
 
-
 val new_combined_11 = Seq(
   "NoiseStreetSideWalk",
   "StreetCondition",
@@ -174,7 +212,6 @@ val new_combined_11 = Seq(
   )
 }
 
-
 val contributingFactorList = Seq(
   "DriverInattention",
   "FailureToYieldRightOfWay",
@@ -188,3 +225,20 @@ val cross_2 = streetList.flatMap(x => contributingFactorList.map(y => (x, y)))
 val correlations_2 = cross_2.map{case (x, y) => (x + " - " + y, new_combined_11.stat.corr(x, y))}
 
 correlations_2.foreach(println)
+
+val pvalues_2 = cross_2.foreach{
+  case (x, y) => 
+  val featureCols = Array(x)
+  val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
+  val mlDf = assembler.transform(comb_8)
+
+  val labelIndexer = new StringIndexer().setInputCol(y).setOutputCol("label")
+  val mldf_2 = labelIndexer.fit(mlDf).transform(mlDf)
+
+  val lr = new LinearRegression().setMaxIter(1000).setRegParam(0.3).setElasticNetParam(0.0)
+  val model = lr.fit(mldf_2)
+  (x + " - " + y, model.summary.pValues(0))
+}
+println("pvalues for the correlation results using Linear regression model")
+println("------------------------------------------------------------------")
+pvalues_2.foreach(println)
